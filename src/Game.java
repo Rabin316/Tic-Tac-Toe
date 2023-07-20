@@ -33,7 +33,26 @@ public class Game extends JFrame{
         currentplayer = 'X';
         setVisible(true);
     }
-
+    //Game reset
+    private void resetGame() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j].setText("");
+                buttons[i][j].setEnabled(true);
+            }
+        }
+        currentplayer = 'X';
+        statuslabel.setText("X's turn");
+    }
+    //Game finish option
+    private void showPlayAgainDialog(String message) {
+        int option = JOptionPane.showConfirmDialog(this, message, "Game Over",JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            resetGame();
+        } else {
+            dispose();
+        }
+    }
     private class ButtonClickListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
             JButton buttonclicked=(JButton)e.getSource();
@@ -43,9 +62,11 @@ public class Game extends JFrame{
             if (checkWin()) {
                     statuslabel.setText(currentplayer + " wins!");
                     disableAllButtons();
+                    showPlayAgainDialog(currentplayer + " wins! Do you want to play again?");// Call showPlayAgainDialog() method
                 } else if (checkDraw()) {
                     statuslabel.setText("It's a draw!");
                     disableAllButtons();
+                    showPlayAgainDialog("It's a draw! Do you want to play again?");// Call showPlayAgainDialog() method
                 } else {
                     currentplayer = (currentplayer == 'X') ? 'O' : 'X';
                     statuslabel.setText(currentplayer + "'s turn");
@@ -92,8 +113,9 @@ public class Game extends JFrame{
                     }
                 }
             }
-            return false;
+            return true;
         }
+        
         private boolean disableAllButtons()
         {
             for(int i=0;i<3;i++){
