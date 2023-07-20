@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -20,7 +19,7 @@ public class Game extends JFrame{
         //create and add buttons
         for(int i=0;i<3;i++){
             for(int j=0;j<3;j++){
-                buttons[i][j]=new JButton();
+                buttons[i][j]=new JButton("");
                 buttons[i][j].setFont(new Font("Arial", Font.PLAIN, 40));
                 buttons[i][j].addActionListener(new ButtonClickListener());
                 panel.add(buttons[i][j]);
@@ -37,7 +36,72 @@ public class Game extends JFrame{
 
     private class ButtonClickListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
-
+            JButton buttonclicked=(JButton)e.getSource();
+            if(buttonclicked.getText().equals("")){
+                buttonclicked.setText(String.valueOf(currentplayer));
+    
+            if (checkWin()) {
+                    statuslabel.setText(currentplayer + " wins!");
+                    disableAllButtons();
+                } else if (checkDraw()) {
+                    statuslabel.setText("It's a draw!");
+                    disableAllButtons();
+                } else {
+                    currentplayer = (currentplayer == 'X') ? 'O' : 'X';
+                    statuslabel.setText(currentplayer + "'s turn");
+                }
+            }
+        }
+        // Win Condition check
+        private boolean checkWin(){
+            //check rows
+            for(int i=0;i<3;i++){
+                if(buttons[i][0].getText().equals(String.valueOf(currentplayer)) && buttons[i][1].getText().equals(String.valueOf(currentplayer))
+                && buttons[i][2].getText().equals(String.valueOf(currentplayer))){
+                    return true;
+                }
+            }
+            //check columns
+            for(int i=0;i<3;i++){
+                if(buttons[0][i].getText().equals(String.valueOf(currentplayer)) && buttons[1][i].getText().equals(String.valueOf(currentplayer))
+                && buttons[2][i].getText().equals(String.valueOf(currentplayer))){
+                    return true;
+                }
+            }
+            //check Diagonals
+            for(int i=0;i<3;i++){
+                if(buttons[0][0].getText().equals(String.valueOf(currentplayer)) && buttons[1][1].getText().equals(String.valueOf(currentplayer))
+                && buttons[2][2].getText().equals(String.valueOf(currentplayer))){
+                    return true;
+                }
+            }
+            for(int i=0;i<3;i++){
+                if(buttons[0][2].getText().equals(String.valueOf(currentplayer)) && buttons[1][1].getText().equals(String.valueOf(currentplayer))
+                && buttons[2][0].getText().equals(String.valueOf(currentplayer))){
+                    return true;
+                }
+            }
+            return false;
+        }
+        //check Draw
+        private boolean checkDraw(){
+            for(int i=0;i<3;i++){
+                for(int j=0;j<3;j++){
+                    if(buttons[i][j].getText().equals("")){
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+        private boolean disableAllButtons()
+        {
+            for(int i=0;i<3;i++){
+                for(int j=0;j<3;j++){
+                    buttons[i][j].setEnabled(false);
+                }
+            }
+            return false;
         }
     }
     public static void main(String[] args) {
