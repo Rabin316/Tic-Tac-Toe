@@ -3,11 +3,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Game extends JFrame{
+public class AIPlayer extends JFrame{
     private JButton [][] buttons;
     private char currentplayer;
     private JLabel statuslabel;
-    public Game(){
+    public AIPlayer(){
         setTitle("Tic-Tac-Toe");
         setSize(300,300);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -32,10 +32,6 @@ public class Game extends JFrame{
         add(statuslabel, BorderLayout.SOUTH);
         currentplayer = 'X';
         setVisible(true);
-        Dimension screensize= Toolkit.getDefaultToolkit().getScreenSize();
-        int centerX=(int)((screensize.getWidth()-getWidth())/2);
-        int centerY=(int)((screensize.getHeight()-getHeight())/2);
-        setLocation(centerX,centerY);
     }
     //Game reset
     private void resetGame() {
