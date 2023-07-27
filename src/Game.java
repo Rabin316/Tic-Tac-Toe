@@ -7,6 +7,7 @@ public class Game extends JFrame{
     private JButton [][] buttons;
     private char currentplayer;
     private JLabel statuslabel;
+    private JButton backButton;
     public Game(){
         setTitle("Tic-Tac-Toe");
         setSize(300,300);
@@ -26,17 +27,35 @@ public class Game extends JFrame{
             }
         }
 
+        backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                backToMainMenu();
+            }
+        });
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(backButton);
+
         statuslabel =new JLabel("X'turn");
         statuslabel.setFont(new Font("Arial",Font.PLAIN,20));
-        add(panel, BorderLayout.CENTER);
-        add(statuslabel, BorderLayout.SOUTH);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(panel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        mainPanel.add(statuslabel, BorderLayout.NORTH);
+
+        add(mainPanel);
+
         currentplayer = 'X';
         setVisible(true);
+
         Dimension screensize= Toolkit.getDefaultToolkit().getScreenSize();
         int centerX=(int)((screensize.getWidth()-getWidth())/2);
         int centerY=(int)((screensize.getHeight()-getHeight())/2);
         setLocation(centerX,centerY);
     }
+
+    
     //Game reset
     private void resetGame() {
         for (int i = 0; i < 3; i++) {
@@ -47,6 +66,10 @@ public class Game extends JFrame{
         }
         currentplayer = 'X';
         statuslabel.setText("X's turn");
+    }
+    private void backToMainMenu() {
+        new MainMenu();
+        dispose();
     }
     //Game finish option
     private void showPlayAgainDialog(String message) {
@@ -131,6 +154,6 @@ public class Game extends JFrame{
         }
     }
     public static void main(String[] args) {
-        new Game();
+        //new Game();
     }
 }

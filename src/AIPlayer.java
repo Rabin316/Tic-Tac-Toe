@@ -2,11 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 public class AIPlayer extends JFrame{
     private JButton [][] buttons;
     private char currentplayer;
     private JLabel statuslabel;
+    private JButton backButton;
     public AIPlayer(){
         setTitle("Tic-Tac-Toe");
         setSize(300,300);
@@ -26,12 +28,32 @@ public class AIPlayer extends JFrame{
             }
         }
 
+        backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                backToMainMenu();
+            }
+        });
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(backButton);
+
         statuslabel =new JLabel("X'turn");
         statuslabel.setFont(new Font("Arial",Font.PLAIN,20));
-        add(panel, BorderLayout.CENTER);
-        add(statuslabel, BorderLayout.SOUTH);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(panel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        mainPanel.add(statuslabel, BorderLayout.NORTH);
+
+        add(mainPanel);
+
         currentplayer = 'X';
         setVisible(true);
+
+        Dimension screensize= Toolkit.getDefaultToolkit().getScreenSize();
+        int centerX=(int)((screensize.getWidth()-getWidth())/2);
+        int centerY=(int)((screensize.getHeight()-getHeight())/2);
+        setLocation(centerX,centerY);
     }
     //Game reset
     private void resetGame() {
@@ -44,7 +66,84 @@ public class AIPlayer extends JFrame{
         currentplayer = 'X';
         statuslabel.setText("X's turn");
     }
-    //Game finish option
+    private void makeAIMove() {
+        // AI's turn
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                // Check if an empty cell is found
+                if (buttons[i][j].getText().equals("")) {
+                    // Simulate placing 'O' in the cell
+                    buttons[i][j].setText(String.valueOf(currentplayer));
+    
+                    if (checkWin('O')) {
+                        // AI wins, end the turn
+                        disableAllButtons();
+                        showPlayAgainDialog("AI wins! Do you want to play again?");
+                    return;
+                    }
+    
+                    // Reset the cell, as we only simulated the move
+                    buttons[i][j].setText("");
+                }
+            }
+        }
+    
+        // Player's turn
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                // Check if an empty cell is found
+                if (buttons[i][j].getText().equals("")) {
+                    // Simulate placing 'X' in the cell
+                    buttons[i][j].setText(String.valueOf('X'));
+    
+                    if (checkWin('X')) {
+                        // Player is about to win, block the move
+                        buttons[i][j].setText(String.valueOf('O'));
+    
+                        if (checkWin('O')) {
+                            // AI wins, end the turn
+                            disableAllButtons();
+                            showGameOverDialog("AI wins!");
+                            return;
+                        }
+                    }
+    
+                    // Reset the cell, as we only simulated the move
+                    buttons[i][j].setText("");
+                }
+            }
+        }
+    
+        // If no winning or blocking move, make a random move
+        Random random = new Random();
+        int row, col;
+    
+        do {
+            row = random.nextInt(3);
+            col = random.nextInt(3);
+        } while (!buttons[row][col].getText().equals(""));
+    
+        buttons[row][col].setText(String.valueOf('O'));
+    
+        if (checkWin('O')) {
+            // AI wins, end the turn
+            disableAllButtons();
+            showGameOverDialog("AI wins!");
+        } else if (checkDraw()) {
+            // It's a draw, end the turn
+            disableAllButtons();
+            showGameOverDialog("It's a draw!");
+        }
+    
+        currentplayer = 'X'; // Switch back to the player's turn
+        statuslabel.setText("X's Turn");
+    }
+    
+    private void backToMainMenu(){
+        new MainMenu();
+        dispose();
+    }
+    // //Game finish option
     private void showPlayAgainDialog(String message) {
         int option = JOptionPane.showConfirmDialog(this, message, "Game Over",JOptionPane.YES_NO_OPTION);
         if (option == JOptionPane.YES_OPTION) {
@@ -53,28 +152,33 @@ public class AIPlayer extends JFrame{
             dispose();
         }
     }
-    private class ButtonClickListener implements ActionListener{
-        public void actionPerformed(ActionEvent e){
-            JButton buttonclicked=(JButton)e.getSource();
-            if(buttonclicked.getText().equals("")){
-                buttonclicked.setText(String.valueOf(currentplayer));
     
-            if (checkWin()) {
-                    statuslabel.setText(currentplayer + " wins!");
+    private class ButtonClickListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JButton buttonClicked = (JButton) e.getSource();
+
+            if (buttonClicked.getText().equals("")) {
+                buttonClicked.setText(String.valueOf(currentplayer));
+
+                if (checkWin(currentplayer)) {
                     disableAllButtons();
-                    showPlayAgainDialog(currentplayer + " wins! Do you want to play again?");// Call showPlayAgainDialog() method
+                    showPlayAgainDialog(currentplayer + " wins! Do you want to play again?");
                 } else if (checkDraw()) {
-                    statuslabel.setText("It's a draw!");
                     disableAllButtons();
-                    showPlayAgainDialog("It's a draw! Do you want to play again?");// Call showPlayAgainDialog() method
+                    showPlayAgainDialog("It's a draw! Do you want to play again?");
                 } else {
                     currentplayer = (currentplayer == 'X') ? 'O' : 'X';
                     statuslabel.setText(currentplayer + "'s turn");
+
+                    if (currentplayer == 'O') {
+                        makeAIMove();
+                    }
                 }
             }
         }
+    }
         // Win Condition check
-        private boolean checkWin(){
+        private boolean checkWin(char player){
             //check rows
             for(int i=0;i<3;i++){
                 if(buttons[i][0].getText().equals(String.valueOf(currentplayer)) && buttons[i][1].getText().equals(String.valueOf(currentplayer))
@@ -115,7 +219,9 @@ public class AIPlayer extends JFrame{
             }
             return true;
         }
-        
+        private void showGameOverDialog(String message) {
+            JOptionPane.showMessageDialog(this, message, "Game Over", JOptionPane.INFORMATION_MESSAGE);
+        }
         private boolean disableAllButtons()
         {
             for(int i=0;i<3;i++){
@@ -125,8 +231,7 @@ public class AIPlayer extends JFrame{
             }
             return false;
         }
-    }
     public static void main(String[] args) {
-        new Game();
+      //  new AIPlayer();
     }
 }
