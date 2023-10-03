@@ -72,13 +72,14 @@ public class Game extends JFrame{
         dispose();
     }
     //Game finish option
-    private void showPlayAgainDialog(String message) {
+    private boolean showPlayAgainDialog(String message) {
         int option = JOptionPane.showConfirmDialog(this, message, "Game Over",JOptionPane.YES_NO_OPTION);
         if (option == JOptionPane.YES_OPTION) {
             resetGame();
         } else {
-            dispose();
+           return false;//hide dialog
         }
+        return true;
     }
     private class ButtonClickListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
